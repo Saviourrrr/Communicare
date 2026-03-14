@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communicare</title>
+    <!-- Google font for clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="landing">
+        <!-- Logo area -->
+            <div class="logo-icon">
+                <img src="logo2.png" alt="Communicare Logo" height="230" width="300">
+            </div>
+            <div class="logo-text">
+                <p>No strings attached. Because we care.</p>
+            </div>
+        <!-- Main buttons -->
+        <div class="main-buttons">
+            <button class="btn-primary" id="createRoomBtn">Create A Room</button>
+            <button class="btn-secondary" id="joinRoomBtn">Join A Room</button>
+        </div>
+
+        <!-- Profile + Username area -->
+<div class="profile-area">
+
+    <!-- Clickable profile preview -->
+    <div class="profile-preview" id="profilePreview">
+        <div class="profile-avatar-preview" id="profileAvatarPreview">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Color picker panel -->
+    <div class="color-picker-panel" id="colorPickerPanel">
+        <p class="color-picker-label">Choose a color</p>
+        <div class="color-options" id="colorOptions"></div>
+    </div>
+
+    <!-- Username input -->
+    <div class="username-area">
+        <label for="usernameInput">Enter your username</label>
+        <input
+            type="text"
+            id="usernameInput"
+            placeholder="Default: Anon User"
+            maxlength="20"
+        />
+    </div>
+
+</div>
+
+        <!-- Join room panel — hidden by default -->
+        <div class="join-panel" id="joinPanel">
+            <p class="join-panel-label">Enter a room code</p>
+            <div class="join-row">
+                <input 
+                    type="text" 
+                    id="roomCodeInput" 
+                    placeholder="000-AAA"
+                    maxlength="7"
+                />
+                <button class="btn-confirm" id="confirmJoinBtn">Join</button>
+            </div>
+            <button class="btn-cancel" id="cancelJoinBtn">Cancel</button>
+        </div>
+
+    </div>
+
+    <!-- Socket.io client (auto-served by socket.io, no file needed) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Our client side logic -->
+    <script src="client.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,979 @@
+/* ---- Reset & Base ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.logo-text{
+    display: block;
+    max-width: 100%;
+    height: auto;
+    color: gray;
+}
+
+:root {
+    --bg: #1a1a1a;
+    --surface: #242424;
+    --surface-hover: #2e2e2e;
+    --border: #333;
+    --text-primary: #e8e8e8;
+    --text-secondary: #888;
+    --accent: #c0c0c0;
+    --white: #ffffff;
+}
+
+body {
+    background-color: #1a1a1a;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridScroll 8s linear infinite, gridPulse 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.landing {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes gridScroll {
+    from { background-position: 0px 0px; }
+    to   { background-position: 40px 40px; }
+}
+
+@keyframes gridPulse {
+    0%   { opacity: 0.8; }
+    70%  { opacity: 1.1; }
+    100% { opacity: 0.8; }
+}
+/* ---- Landing Layout ---- */
+.landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeUp 1.0s ease forwards;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0.3; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+body
+/* ---- Buttons ---- */
+
+
+.main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--white);
+    color: #111;
+    border: none;
+    border-radius: 2px;
+    font-family: system-ui;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    color: var(--text-primary);
+    background-color: #111;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    font-family: system-ui;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background 0.3s ease, transform 0.15s ease;
+}
+
+.btn-secondary:hover {
+    border-color: #666;
+    background: var(--surface);
+    transform: translateY(-1px);
+}
+
+/* ---- Username input ---- */
+.username-area {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
+.username-area label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: system-ui;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.username-area input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: system-ui;
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease;
+    outline: none;
+}
+
+.username-area input:focus {
+    border-color: #666;
+}
+
+/* ---- Join panel ---- */
+.join-panel {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    /* Hidden by default */
+    display: none;
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.join-panel.visible {
+    display: flex;
+}
+
+.join-panel-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: system-ui;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.join-row {
+    display: flex;
+    gap: 10px;
+}
+
+.join-row input {
+    flex: 1;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: system-ui;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.join-row input:focus {
+    border-color: #666;
+}
+
+.btn-confirm {
+    padding: 12px 20px;
+    background: var(--white);
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    font-family: system-ui;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-confirm:hover {
+    background: var(--accent);
+}
+
+.btn-cancel {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-family: system-ui;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    transition: color 0.15s ease;
+}
+
+.btn-cancel:hover {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   ROOM PAGE
+   ============================================ */
+
+body.room-page {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+    background: #111;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ── Main Screen ── */
+.main-screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    width: 100%;
+    min-height: 0;
+}
+
+.slots-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── Individual Slot ── */
+.slot {
+    background: #1c1c1c;
+    border: 1.5px solid #2a2a2a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+    aspect-ratio: unset;
+}
+
+/* Filled slot — user avatar */
+.slot-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+}
+
+.slot-username {
+    font-size: 0.9rem;
+    color: #ccc;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+}
+
+/* Empty slot — plus button */
+.slot-empty-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px dashed #333;
+    background: none;
+    color: #444;
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    line-height: 1;
+}
+
+.slot-empty-btn:hover {
+    border-color: #666;
+    color: #888;
+}
+
+/* Screen share slot */
+.slot video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.slot-fullscreen-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.slot:hover .slot-fullscreen-btn {
+    opacity: 1;
+}
+
+/* ── Control Tab ── */
+.control-tab {
+    height: 80px;
+    background: #161616;
+    border-top: 1.5px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 20px;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.ctrl-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    min-width: 80px;
+}
+
+.ctrl-btn:hover {
+    background: #222;
+    color: #ddd;
+    border-color: #333;
+}
+
+.ctrl-btn.active {
+    background: #2a2a2a;
+    color: white;
+    border-color: #444;
+}
+
+.leave-btn {
+    color: #c0392b;
+}
+
+.leave-btn:hover {
+    background: #2a1515;
+    color: #e74c3c;
+    border-color: #5a2020;
+}
+
+/* ── Side Panels (Chat + Options) ── */
+.side-panel {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 340px;
+    height: calc(100vh - 80px);
+    background: #1a1a1a;
+    border-left: 1.5px solid #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.25s ease;
+    z-index: 100;
+}
+
+.side-panel.open {
+    right: 0;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1.5px solid #2a2a2a;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.15s;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.panel-close:hover {
+    color: #ccc;
+    background: #2a2a2a;
+}
+
+/* Chat */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.chat-message .msg-author {
+    font-size: 0.75rem;
+    color: #666;
+    font-family: 'DM Mono', monospace;
+}
+
+.chat-message .msg-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    border-top: 1.5px solid #2a2a2a;
+}
+
+.chat-input-row input {
+    flex: 1;
+    padding: 10px 12px;
+    background: #111;
+    border: 1.5px solid #2a2a2a;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.chat-input-row input:focus {
+    border-color: #444;
+}
+
+.chat-input-row button {
+    padding: 10px 16px;
+    background: #e0e0e0;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.chat-input-row button:hover {
+    background: white;
+}
+
+/* Options */
+.options-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.option-row.column {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.option-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.option-label {
+    font-size: 0.9rem;
+    color: #ddd;
+    font-weight: 500;
+}
+
+.option-desc {
+    font-size: 0.78rem;
+    color: #555;
+}
+
+.option-divider {
+    height: 1px;
+    background: #2a2a2a;
+    width: 100%;
+}
+
+.toggle-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #333;
+    background: transparent;
+    color: #666;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-width: 54px;
+}
+
+.toggle-btn[data-active="true"] {
+    background: #e0e0e0;
+    color: #111;
+    border-color: #e0e0e0;
+}
+
+.option-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: #111;
+    border: 1.5px solid #2a2a2a;
+    border-radius: 6px;
+    color: #ccc;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.option-slider {
+    width: 100%;
+    accent-color: #e0e0e0;
+    cursor: pointer;
+}
+
+/* ── Empty Slot Popup ── */
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.popup-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.popup-box {
+    background: #1e1e1e;
+    border: 1.5px solid #333;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 320px;
+    width: 90%;
+    animation: fadeUp 0.2s ease;
+}
+
+.popup-message {
+    font-size: 1rem;
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+.popup-sub {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.popup-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.4rem;
+    color: white;
+    letter-spacing: 0.1em;
+    padding: 14px;
+    background: #111;
+    border-radius: 8px;
+    border: 1.5px solid #2a2a2a;
+    margin: 6px 0;
+}
+
+.popup-close {
+    padding: 10px;
+    background: #e0e0e0;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s;
+}
+
+.popup-close:hover {
+    background: white;
+}
+
+/* Pulsing play indicator on sharer's slot */
+.play-indicator {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 1.5s ease-in-out infinite;
+    transition: background 0.15s ease;
+    z-index: 10;
+}
+
+.play-indicator:hover {
+    background: rgba(54, 44, 44, 0.3);
+}
+
+@keyframes pulse {
+    0%   { transform: scale(1);    opacity: 1; }
+    50%  { transform: scale(1.15); opacity: 0.7; }
+    100% { transform: scale(1);    opacity: 1; }
+}
+
+/* Stop viewing button */
+.stop-viewing-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.slot:hover .stop-viewing-btn {
+    opacity: 1;
+}
+
+/* Make slot relative so buttons position correctly */
+.slot {
+    position: relative;
+}
+
+/* ── Crown icon on slots ── */
+.crown-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 28px;
+    height: 28px;
+    color: #444;
+    opacity: 0;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+}
+
+.crown-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.crown-icon.active {
+    color: #f1c40f;
+    opacity: 1;
+}
+
+/* ── VIP panel in options ── */
+.vip-section-label {
+    font-size: 0.8rem;
+    color: #f1c40f;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.vip-action-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1.5px solid #333;
+    border-radius: 6px;
+    color: #ccc;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    margin-top: 6px;
+}
+
+.vip-action-btn:hover {
+    background: #2a2a2a;
+    border-color: #555;
+    color: white;
+}
+
+.vip-action-btn.reroll {
+    border-color: #f1c40f44;
+    color: #f1c40f;
+}
+
+.vip-action-btn.reroll:hover {
+    background: #2a2500;
+    border-color: #f1c40f;
+}
+
+/* ── User picker list ── */
+.user-pick-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #111;
+    border: 1.5px solid #2a2a2a;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.user-pick-btn:hover {
+    background: #1e1e1e;
+    border-color: #444;
+}
+
+.user-pick-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* ── Profile area ── */
+.profile-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    position: relative;
+}
+
+.profile-preview {
+    cursor: pointer;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+}
+
+.profile-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
+}
+
+.profile-avatar-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e74c3c;
+    color: rgba(255,255,255,0.9);
+    transition: background 0.2s ease;
+}
+
+.profile-avatar-preview svg {
+    width: 42px;
+    height: 42px;
+}
+
+/* ── Color picker panel ── */
+.color-picker-panel {
+    background: #1e1e1e;
+    border: 1.5px solid #333;
+    border-radius: 12px;
+    padding: 16px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    animation: fadeUp 0.15s ease;
+}
+
+.color-picker-panel.open {
+    display: flex;
+}
+
+.color-picker-label {
+    font-size: 0.75rem;
+    color: #666;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.color-options {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+}
+
+.color-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.15);
+}
+
+.color-swatch.selected {
+    border-color: white;
+    transform: scale(1.15);
+}
+
+/* ── Room slot avatar — silhouette style ── */
+.slot-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.9);
+    flex-shrink: 0;
+}
+
+.slot-avatar svg {
+    width: 44px;
+    height: 44px;
+}
