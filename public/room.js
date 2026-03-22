@@ -312,13 +312,9 @@ async function startScreenShare() {
 
         const videoTrack = screenStream.getVideoTracks()[0];
 
+        // Add track to every peer and renegotiate
         for (const [targetId, pc] of Object.entries(peerConnections)) {
-            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
-            if (sender) {
-                await sender.replaceTrack(videoTrack);
-            } else {
-                pc.addTrack(videoTrack, screenStream);
-            }
+            pc.addTrack(videoTrack, screenStream);
             try {
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
@@ -330,10 +326,13 @@ async function startScreenShare() {
 
         socket.emit('screen-share-started', { roomCode, userId: socket.id });
 
+        // Sharer sees their own screen immediately — no play button
         remoteScreenStreams[socket.id] = screenStream;
-        viewScreen(socket.id);
+        viewScreen(socket.id, true);
 
+        // Browser's built in stop button
         videoTrack.onended = () => stopScreenShare();
+
         console.log('Screen sharing started');
     } catch (err) {
         console.error('Screen share error:', err);
@@ -350,10 +349,74 @@ function stopScreenShare() {
         screenStream = null;
     }
 
+    // Remove video senders so next share always uses addTrack
+    for (const pc of Object.values(peerConnections)) {
+        const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+        if (sender) pc.removeTrack(sender);
+    }
+
     socket.emit('screen-share-stopped', { roomCode, userId: socket.id });
+
     delete remoteScreenStreams[socket.id];
-    if (currentlyViewing === socket.id) currentlyViewing = null;
-    buildSlots();
+    currentlyViewing = null;
+
+    // Restore own slot to avatar
+    restoreSlot(socket.id);
+    console.log('Screen sharing stopped');
+}
+
+// isSelf = true means sharer viewing their own screen — no play button on stop
+function viewScreen(userId, isSelf = false) {
+    const stream = remoteScreenStreams[userId];
+    if (!stream) return;
+
+    // If already viewing a different stream, close it first
+    if (currentlyViewing && currentlyViewing !== userId) {
+        const prevIndex = users.findIndex(u => u.id === currentlyViewing);
+        if (prevIndex !== -1) {
+            restoreSlot(currentlyViewing);
+            // Show play button again on the one we stopped viewing
+            // only if that stream is still active
+            if (remoteScreenStreams[currentlyViewing]) {
+                showPlayButton(currentlyViewing);
+            }
+        }
+    }
+
+    currentlyViewing = userId;
+
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) return;
+    const slot = document.getElementById(`slot-${userIndex}`);
+    if (!slot) return;
+
+    slot.innerHTML = `
+        <video autoplay playsinline></video>
+        <button class="slot-fullscreen-btn">⛶ Fullscreen</button>
+        <button class="stop-viewing-btn">✕ Stop viewing</button>
+    `;
+
+    const video = slot.querySelector('video');
+    video.srcObject = stream;
+
+    slot.querySelector('.slot-fullscreen-btn').addEventListener('click', () => {
+        if (video.requestFullscreen) video.requestFullscreen();
+    });
+
+    slot.querySelector('.stop-viewing-btn').addEventListener('click', () => {
+        if (isSelf) {
+            // Sharer stopping view = stop the whole share
+            stopScreenShare();
+        } else {
+            // Viewer stopping view = just close view, stream still active
+            slot.innerHTML = '';
+            currentlyViewing = null;
+            restoreSlot(userId);
+            if (remoteScreenStreams[userId]) {
+                showPlayButton(userId);
+            }
+        }
+    });
 }
 
 function showPlayButton(userId) {
@@ -361,46 +424,19 @@ function showPlayButton(userId) {
     if (userIndex === -1) return;
     const slot = document.getElementById(`slot-${userIndex}`);
     if (!slot) return;
-    const existing = slot.querySelector('.play-indicator');
-    if (existing) existing.remove();
+
+    // Don't add duplicate
+    if (slot.querySelector('.play-indicator')) return;
+
     const playBtn = document.createElement('button');
     playBtn.classList.add('play-indicator');
     playBtn.innerHTML = '▶';
     playBtn.title = 'Click to view screen share';
-    playBtn.addEventListener('click', () => viewScreen(userId));
+    playBtn.addEventListener('click', () => viewScreen(userId, false));
     slot.appendChild(playBtn);
 }
 
-function viewScreen(userId) {
-    const stream = remoteScreenStreams[userId];
-    if (!stream) return;
-    if (currentlyViewing && currentlyViewing !== userId) {
-        restoreSlot(currentlyViewing);
-    }
-    currentlyViewing = userId;
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) return;
-    const slot = document.getElementById(`slot-${userIndex}`);
-    if (!slot) return;
-    slot.innerHTML = `
-        <video autoplay playsinline></video>
-        <button class="slot-fullscreen-btn">⛶ Fullscreen</button>
-        <button class="stop-viewing-btn">✕ Stop viewing</button>
-    `;
-    const video = slot.querySelector('video');
-    video.srcObject = stream;
-    slot.querySelector('.slot-fullscreen-btn').addEventListener('click', () => {
-        if (video.requestFullscreen) video.requestFullscreen();
-    });
-    slot.querySelector('.stop-viewing-btn').addEventListener('click', () => {
-        currentlyViewing = null;
-        restoreSlot(userId);
-        showPlayButton(userId);
-    });
-}
-
 function restoreSlot(userId) {
-    function restoreSlot(userId) {
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) return;
     const slot = document.getElementById(`slot-${userIndex}`);
@@ -419,16 +455,22 @@ function restoreSlot(userId) {
         <span class="slot-username">${user.username}</span>
     `;
 }
-}
 
 socket.on('screen-share-started', ({ userId }) => {
     console.log('User started sharing:', userId);
+    // Play button will appear automatically when ontrack fires with the video stream
 });
 
 socket.on('screen-share-stopped', ({ userId }) => {
     console.log('User stopped sharing:', userId);
     delete remoteScreenStreams[userId];
-    if (currentlyViewing === userId) currentlyViewing = null;
+
+    // If we were viewing this stream, close view mode
+    if (currentlyViewing === userId) {
+        currentlyViewing = null;
+    }
+
+    // Restore their slot — removes both video view and play button
     restoreSlot(userId);
 });
 
