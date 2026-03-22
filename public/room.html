@@ -35,12 +35,12 @@
         </button>
 
         <button class="ctrl-btn" id="chatBtn">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <span>Chat</span>
-        </button>
-
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span>Chat</span>
+    <div id="chatUnreadDot" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;background:#e74c3c;border-radius:50%;"></div>
+</button>
         <button class="ctrl-btn" id="optionsBtn">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"/>
@@ -151,6 +151,7 @@
             <p class="popup-message">Invite someone to join the call.</p>
             <p class="popup-sub">Or not...its okay to have no friends!</p>
             <div class="popup-code" id="popupCode"></div>
+            <p class="popup-sub2">(Code copied to clipboard)</p>
             <button class="popup-close" id="closePopupBtn">Got it</button>
         </div>
     </div>

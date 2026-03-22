@@ -391,6 +391,7 @@ body.room-page {
 }
 
 .ctrl-btn {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -679,6 +680,12 @@ body.room-page {
 .popup-sub {
     font-size: 0.85rem;
     color: #666;
+    padding-bottom: 5px;
+}
+
+.popup-sub2 {
+    font-size: 0.85rem;
+    color: #c0c0c0;
 }
 
 .popup-code {
@@ -976,4 +983,20 @@ body.room-page {
 .slot-avatar svg {
     width: 44px;
     height: 44px;
+}
+
+/* ── Mute/Deafen state icons on slots ── */
+.state-icons {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 4px;
+}
+
+.state-icon {
+    width: 20px;
+    height: 20px;
+    color: #ccc;
+    opacity: 0.9;
 }

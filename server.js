@@ -266,6 +266,14 @@ io.on('connection', (socket) => {
         console.log(`Room rerolled: ${roomCode} → ${newCode}`);
     });
 
+    socket.on('mute-state', ({ roomCode, isMuted }) => {
+        socket.to(roomCode).emit('user-mute-state', { userId: socket.id, isMuted });
+    });
+
+    socket.on('deafen-state', ({ roomCode, isDeafened }) => {
+        socket.to(roomCode).emit('user-deafen-state', { userId: socket.id, isDeafened });
+    });
+
     socket.on('disconnect', () => {
         const code = socket.currentRoom;
         if (!code) return;

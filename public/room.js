@@ -4,6 +4,8 @@ let roomCode = params.get('code');
 const myUsername = params.get('username') || 'Anon User';
 const myUID = params.get('uid') || Math.random().toString(36).substr(2, 9);
 const myColor = decodeURIComponent(params.get('color') || '#e74c3c');
+let chatIsOpen = false;
+let unreadMessages = 0;
 
 console.log('Room loaded. Code:', roomCode, 'User:', myUsername);
 
@@ -21,6 +23,9 @@ const RTC_CONFIG = {
         { urls: 'stun:stun1.l.google.com:19302' }
     ]
 };
+
+// Track mute/deafen state per user
+const userStates = {};
 
 // ── State ──
 let users = [];
@@ -127,8 +132,9 @@ function buildSlots() {
                 <span class="slot-username">${user.username}</span>
             `;
             if (remoteScreenStreams[user.id]) {
-                showPlayButton(user.id);
-            }
+    showPlayButton(user.id);
+}
+updateUserStateIcons(user.id);
         } else {
             const emptyBtn = document.createElement('button');
             emptyBtn.classList.add('slot-empty-btn');
@@ -155,6 +161,48 @@ function setSpeakingIndicator(userId, speaking) {
         slot.style.borderColor = '';
         slot.style.boxShadow = '';
     }
+}
+
+function updateUserStateIcons(userId) {
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) return;
+    const slot = document.getElementById(`slot-${userIndex}`);
+    if (!slot) return;
+
+    const state = userStates[userId] || {};
+
+    // Remove existing icons
+    const existing = slot.querySelector('.state-icons');
+    if (existing) existing.remove();
+
+    // Only add if muted or deafened
+    if (!state.isMuted && !state.isDeafened) return;
+
+    const icons = document.createElement('div');
+    icons.classList.add('state-icons');
+
+    if (state.isDeafened) {
+        icons.innerHTML += `
+            <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Deafened">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/>
+                <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="#e74c3c"/>
+            </svg>
+        `;
+    } else if (state.isMuted) {
+        icons.innerHTML += `
+            <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Muted">
+                <line x1="1" y1="1" x2="23" y2="23" stroke="#e74c3c"/>
+                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/>
+                <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+        `;
+    }
+
+    slot.appendChild(icons);
 }
 
 // ═══════════════════════════════════════════
@@ -241,6 +289,18 @@ function closePeerConnection(userId) {
     const audioEl = document.getElementById(`audio-${userId}`);
     if (audioEl) audioEl.remove();
 }
+
+socket.on('user-mute-state', ({ userId, isMuted }) => {
+    if (!userStates[userId]) userStates[userId] = {};
+    userStates[userId].isMuted = isMuted;
+    updateUserStateIcons(userId);
+});
+
+socket.on('user-deafen-state', ({ userId, isDeafened }) => {
+    if (!userStates[userId]) userStates[userId] = {};
+    userStates[userId].isDeafened = isDeafened;
+    updateUserStateIcons(userId);
+});
 
 socket.on('webrtc-offer', async ({ offer, fromId }) => {
     console.log('Received offer from:', fromId);
@@ -454,6 +514,8 @@ function restoreSlot(userId) {
         </div>
         <span class="slot-username">${user.username}</span>
     `;
+    // Re-apply state icons after rebuilding slot
+    updateUserStateIcons(userId);
 }
 
 socket.on('screen-share-started', ({ userId }) => {
@@ -490,13 +552,22 @@ const optionsBtn   = document.getElementById('optionsBtn');
 chatBtn.addEventListener('click', () => {
     const isOpen = chatPanel.classList.toggle('open');
     chatBtn.classList.toggle('active', isOpen);
+    chatIsOpen = isOpen;
     optionsPanel.classList.remove('open');
     optionsBtn.classList.remove('active');
+
+    // Clear unread indicator when opening
+    if (isOpen) {
+        unreadMessages = 0;
+        const dot = document.getElementById('chatUnreadDot');
+        if (dot) dot.style.display = 'none';
+    }
 });
 
 document.getElementById('closeChatBtn').addEventListener('click', () => {
     chatPanel.classList.remove('open');
     chatBtn.classList.remove('active');
+    chatIsOpen = false;
 });
 
 optionsBtn.addEventListener('click', () => {
@@ -524,13 +595,30 @@ document.getElementById('leaveBtn').addEventListener('click', () => {
 
 document.getElementById('muteBtn').addEventListener('click', () => {
     isMuted = !isMuted;
+
+    // If we were deafened and are now unmuting, undeafen too
+    if (!isMuted && isDeafened) {
+        isDeafened = false;
+        const deafBtn = document.getElementById('deafenBtn');
+        deafBtn.dataset.active = 'false';
+        deafBtn.textContent = 'Off';
+        document.querySelectorAll('audio[id^="audio-"]').forEach(el => { el.muted = false; });
+        socket.emit('deafen-state', { roomCode, isDeafened: false });
+    }
+
     const btn = document.getElementById('muteBtn');
     btn.dataset.active = String(isMuted);
     btn.textContent = isMuted ? 'On' : 'Off';
+
     if (localStream) {
         localStream.getAudioTracks().forEach(track => { track.enabled = !isMuted; });
     }
-    if (isMuted) setSpeakingIndicator(socket.id, false);
+
+    socket.emit('mute-state', { roomCode, isMuted });
+    if (!userStates[socket.id]) userStates[socket.id] = {};
+    userStates[socket.id].isMuted = isMuted;
+    userStates[socket.id].isDeafened = isDeafened;
+    updateUserStateIcons(socket.id);
     console.log('Muted:', isMuted);
 });
 
@@ -539,15 +627,27 @@ document.getElementById('deafenBtn').addEventListener('click', () => {
     const btn = document.getElementById('deafenBtn');
     btn.dataset.active = String(isDeafened);
     btn.textContent = isDeafened ? 'On' : 'Off';
+
+    // Deafening auto mutes — undeafening turns mute off too
     isMuted = isDeafened;
     const muteBtn = document.getElementById('muteBtn');
     muteBtn.dataset.active = String(isMuted);
     muteBtn.textContent = isMuted ? 'On' : 'Off';
+
     if (localStream) {
         localStream.getAudioTracks().forEach(track => { track.enabled = !isDeafened; });
     }
+
     document.querySelectorAll('audio[id^="audio-"]').forEach(el => { el.muted = isDeafened; });
+
     if (isDeafened) setSpeakingIndicator(socket.id, false);
+
+    socket.emit('mute-state', { roomCode, isMuted });
+    socket.emit('deafen-state', { roomCode, isDeafened });
+    if (!userStates[socket.id]) userStates[socket.id] = {};
+    userStates[socket.id].isMuted = isMuted;
+    userStates[socket.id].isDeafened = isDeafened;
+    updateUserStateIcons(socket.id);
     console.log('Deafened:', isDeafened);
 });
 
@@ -627,6 +727,13 @@ chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessag
 
 socket.on('chat-message', ({ username, text }) => {
     appendMessage(username, text);
+
+    // Show unread dot if chat is closed
+    if (!chatIsOpen) {
+        unreadMessages++;
+        const dot = document.getElementById('chatUnreadDot');
+        if (dot) dot.style.display = 'block';
+    }
 });
 
 // ═══════════════════════════════════════════
